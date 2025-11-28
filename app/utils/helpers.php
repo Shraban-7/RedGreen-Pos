@@ -30,13 +30,16 @@ if (! function_exists('currency_symbol')) {
 }
 
 if (! function_exists('str_slug')) {
-    function str_slug($table, $column, $title, $separator = '-')
+    function str_slug($table, $column, $title, $separator = '-', $ignoreId = null)
     {
-        $slug         = Str::slug($title, $separator);
+        $slug         = \Illuminate\Support\Str::slug($title, $separator);
         $originalSlug = $slug;
         $count        = 1;
 
-        while (DB::table($table)->where($column, $slug)->exists()) {
+        while (\DB::table($table)
+                  ->where($column, $slug)
+                  ->when($ignoreId, fn($query) => $query->where('id', '!=', $ignoreId))
+                  ->exists()) {
             $slug = "{$originalSlug}{$separator}{$count}";
             $count++;
         }
@@ -44,6 +47,7 @@ if (! function_exists('str_slug')) {
         return $slug;
     }
 }
+
 
 if (! function_exists('sendValidationError')) {
     function sendValidationError($errors)

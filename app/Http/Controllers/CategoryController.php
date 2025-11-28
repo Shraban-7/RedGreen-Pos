@@ -2,64 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryRequest;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(private CategoryService $categoryService)
+    {
+    }
+
     public function index()
     {
-        //
+        $categories = $this->categoryService->getAll();
+
+        return apiResourceResponse(
+            CategoryResource::collection($categories),
+            'Categories fetched successfully',
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(CategoryRequest $request)
     {
-        //
+        $category = $this->categoryService->save($request->validated());
+
+        return apiResourceResponse(
+            new CategoryResource($category),
+            'Category created successfully',
+            [],
+            201
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($slug)
     {
-        //
+        $category = $this->categoryService->getBySlug($slug);
+
+        if (!$category) {
+            return errorResponse('Category not found', 404);
+        }
+
+        return apiResourceResponse(
+            new CategoryResource($category),
+            'Category fetched successfully',
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
+    public function update(CategoryRequest $request, $slug)
     {
-        //
+        $category = $this->categoryService->getBySlug($slug);
+
+        if (!$category) {
+            return errorResponse('Category not found', 404);
+        }
+
+        $updated = $this->categoryService->update($category, $request->validated());
+
+        return apiResourceResponse(
+            new CategoryResource($updated),
+            'Category updated successfully',
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
+    public function destroy($slug)
     {
-        //
-    }
+        $category = $this->categoryService->getBySlug($slug);
+        $this->categoryService->delete($category);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
-    {
-        //
+        return successResponse('Category deleted successfully', 200);
     }
 }
