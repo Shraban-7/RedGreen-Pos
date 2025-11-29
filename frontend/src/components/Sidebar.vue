@@ -10,7 +10,7 @@
             <transition name="fade" mode="out-in">
                 <div v-if="!collapsed" class="flex items-center gap-3 px-6">
                     <div
-                        class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        class="w-9 h-9 bg-linear-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
                         <i class="pi pi-shopping-cart text-white text-lg"></i>
                     </div>
                     <div>
@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <div v-else
-                    class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    class="w-9 h-9 bg-linear-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
                     <i class="pi pi-shopping-cart text-white text-lg"></i>
                 </div>
             </transition>
@@ -72,7 +72,7 @@
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200/30 bg-white/30 backdrop-blur-sm">
             <div :class="['flex items-center gap-3', collapsed ? 'justify-center' : '']">
                 <div
-                    class="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center font-semibold text-white text-sm shadow-lg">
+                    class="w-9 h-9 bg-linear-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center font-semibold text-white text-sm shadow-lg">
                     JD
                 </div>
                 <transition name="fade" mode="out-in">
@@ -90,16 +90,6 @@
 import { ref } from 'vue'
 
 const collapsed = ref(false)
-
-const menuItems = ref([
-    { label: 'Dashboard', icon: 'pi pi-home', active: true },
-    { label: 'Sales', icon: 'pi pi-shopping-cart', badge: '3' },
-    { label: 'Products', icon: 'pi pi-box' },
-    { label: 'Inventory', icon: 'pi pi-database' },
-    { label: 'Customers', icon: 'pi pi-users' },
-    { label: 'Reports', icon: 'pi pi-chart-line' },
-    { label: 'Settings', icon: 'pi pi-cog' },
-])
 
 const toggleCollapse = () => {
     collapsed.value = !collapsed.value
