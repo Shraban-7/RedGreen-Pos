@@ -1,84 +1,87 @@
 <template>
     <aside :class="[
-        'bg-white/40 backdrop-blur-xl border-r border-white/20',
+        'bg-gray-900 border-r border-gray-800',
         'transition-all duration-300 ease-in-out',
-        'relative z-20 shadow-xl shadow-gray-900/5',
+        'relative z-20 shadow-xl shadow-black/40',
         collapsed ? 'w-20' : 'w-64'
     ]">
-        <!-- Logo Section -->
-        <div class="h-16 flex items-center justify-center border-b border-gray-200/30">
-            <transition name="fade" mode="out-in">
+        <!-- Logo -->
+        <div class="h-16 flex items-center justify-center border-b border-gray-800">
+            <transition name="fade">
                 <div v-if="!collapsed" class="flex items-center gap-3 px-6">
                     <div
-                        class="w-9 h-9 bg-linear-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <i class="pi pi-shopping-cart text-white text-lg"></i>
+                        class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-900/40">
+                        <i class="pi pi-shop text-white text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-gray-800">POS</h1>
-                        <p class="text-xs text-gray-500">System</p>
+                        <h1 class="text-lg font-bold text-white">POS</h1>
+                        <p class="text-xs text-gray-400">Management</p>
                     </div>
                 </div>
+
                 <div v-else
-                    class="w-9 h-9 bg-linear-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <i class="pi pi-shopping-cart text-white text-lg"></i>
+                    class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-900/40">
+                    <i class="fa-solid fa-store text-white text-lg"></i>
                 </div>
             </transition>
         </div>
 
-        <!-- Navigation Menu -->
+        <!-- Menu -->
         <nav class="mt-4 px-3 space-y-1">
-            <div v-for="item in menuItems" :key="item.label" :class="[
-                'flex items-center gap-3 px-4 py-3 rounded-lg',
-                'transition-all duration-200 cursor-pointer group relative',
-                'hover:bg-white/60 hover:shadow-md',
-                item.active ? 'bg-white/70 shadow-md' : ''
-            ]">
-                <i :class="[
-                    item.icon,
-                    'text-lg transition-colors',
-                    item.active ? 'text-indigo-600' : 'text-gray-600 group-hover:text-indigo-600'
-                ]"></i>
+            <router-link v-for="link in links" :key="link.name" :to="link.path" class="block">
+                <div :class="[
+                    'flex items-center gap-3 px-4 py-3 rounded-lg group transition-all',
+                    isActive(link.path)
+                        ? 'bg-gray-800 shadow-lg'
+                        : 'hover:bg-gray-800/70 hover:shadow'
+                ]">
+                    <i :class="[
+                        link.icon,
+                        'text-lg',
+                        isActive(link.path)
+                            ? 'text-indigo-400'
+                            : 'text-gray-400 group-hover:text-indigo-400'
+                    ]"></i>
 
-                <transition name="fade" mode="out-in">
-                    <div v-if="!collapsed" class="flex-1 flex items-center justify-between">
-                        <span :class="[
+                    <!-- Name (hidden when collapsed) -->
+                    <transition name="fade">
+                        <span v-if="!collapsed" :class="[
                             'text-sm font-medium transition-colors',
-                            item.active ? 'text-gray-900' : 'text-gray-700 group-hover:text-gray-900'
+                            isActive(link.path)
+                                ? 'text-white'
+                                : 'text-gray-300 group-hover:text-white'
                         ]">
-                            {{ item.label }}
+                            {{ link.name }}
                         </span>
-                        <span v-if="item.badge"
-                            class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">
-                            {{ item.badge }}
-                        </span>
-                    </div>
-                </transition>
+                    </transition>
 
-                <!-- Tooltip for collapsed state -->
-                <div v-if="collapsed"
-                    class="absolute left-full ml-2 px-3 py-1.5 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
-                    {{ item.label }}
+                    <!-- Collapsed tooltip -->
+                    <div v-if="collapsed" class="absolute left-full ml-2 px-3 py-1 bg-black text-white text-xs rounded-md 
+                              opacity-0 group-hover:opacity-100 transition-opacity shadow-xl whitespace-nowrap">
+                        {{ link.name }}
+                    </div>
                 </div>
-            </div>
+            </router-link>
         </nav>
 
         <!-- Collapse Button -->
-        <button @click="toggleCollapse"
-            class="absolute -right-3 top-20 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-200">
-            <i :class="['pi text-xs text-gray-600', collapsed ? 'pi-chevron-right' : 'pi-chevron-left']"></i>
+        <button @click="toggleCollapse" class="absolute -right-3 top-20 w-7 h-7 bg-gray-900 border border-gray-700 rounded-full shadow-xl
+                   flex items-center justify-center hover:scale-110 transition-all">
+            <i
+                :class="['text-xs text-gray-300', collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left']"></i>
         </button>
 
-        <!-- User Profile (Bottom) -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200/30 bg-white/30 backdrop-blur-sm">
+        <!-- User Profile -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800 bg-gray-800/40">
             <div :class="['flex items-center gap-3', collapsed ? 'justify-center' : '']">
                 <div
-                    class="w-9 h-9 bg-linear-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center font-semibold text-white text-sm shadow-lg">
+                    class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow">
                     JD
                 </div>
-                <transition name="fade" mode="out-in">
+                <transition name="fade">
                     <div v-if="!collapsed">
-                        <p class="font-semibold text-sm text-gray-800">John Doe</p>
-                        <p class="text-xs text-gray-500">Admin</p>
+                        <p class="text-sm text-white font-semibold">John Doe</p>
+                        <p class="text-xs text-gray-400">Admin</p>
                     </div>
                 </transition>
             </div>
@@ -87,13 +90,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue"
+import { useRoute } from "vue-router"
+import { menuLinks } from "@/config/sidebarLinks"
 
 const collapsed = ref(false)
+const links = menuLinks
+const route = useRoute()
 
-const toggleCollapse = () => {
-    collapsed.value = !collapsed.value
-}
+const toggleCollapse = () => (collapsed.value = !collapsed.value)
+
+const isActive = (path) => route.path.startsWith(path)
 </script>
 
 <style scoped>

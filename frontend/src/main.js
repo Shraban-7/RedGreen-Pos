@@ -7,12 +7,12 @@ import router from './routes/router'
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserSecret, faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import ToastService from 'primevue/toastservice'
+import Toast from 'primevue/toast';
 
 library.add(faUserSecret, faCoffee);
 
 const app = createApp(App)
-
-app.component('font-awesome-icon', FontAwesomeIcon);
 
 app.use(router)
 app.use(PrimeVue, {
@@ -24,4 +24,9 @@ app.use(PrimeVue, {
         }
     }
 });
+
+app.use(ToastService) 
+app.component('Toast', Toast)
+app.component('font-awesome-icon', FontAwesomeIcon);
+
 app.mount('#app')

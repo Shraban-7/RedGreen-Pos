@@ -2,21 +2,26 @@ export const menuLinks = [
   {
     name: "Dashboard",
     path: "/dashboard",
-    icon: "fa-solid fa-chart-line",
+    icon: "pi pi-home",
   },
   {
     name: "Products",
     path: "/products",
-    icon: "fa-solid fa-box",
+    icon: "pi pi-box",
+  },
+  {
+    name: "categories",
+    path: "/categories",
+    icon: "pi pi-list",
   },
   {
     name: "Orders",
     path: "/orders",
-    icon: "fa-solid fa-cart-shopping",
+    icon: "pi pi-shopping-cart",
   },
   {
     name: "Reports",
     path: "/reports",
-    icon: "fa-solid fa-chart-pie",
+    icon: "pi pi-chart-line",
   },
 ];
