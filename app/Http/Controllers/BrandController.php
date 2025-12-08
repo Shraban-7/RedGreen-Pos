@@ -19,6 +19,11 @@ class BrandController extends Controller
     public function index()
     {
         $brands = $this->brandService->getAll();
+
+        return apiResourceResponse(
+            BrandResource::collection($brands),
+            'Brands fetched successfully',
+        );
     }
 
     public function store(BrandRequest $request)

@@ -15,6 +15,11 @@ export const menuLinks = [
     icon: "pi pi-list",
   },
   {
+    name: "brands",
+    path: "/brands",
+    icon: "pi pi-building",
+  },
+  {
     name: "Orders",
     path: "/orders",
     icon: "pi pi-shopping-cart",

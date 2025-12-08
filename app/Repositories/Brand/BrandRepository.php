@@ -23,7 +23,7 @@ class BrandRepository implements BrandRepositoryInterface
 
     public function findBySlug($slug)
     {
-        return Brand::where('slug', $slug)->firstOrFail();
+        return Brand::where('slug', $slug)->first();
     }
 
 
