@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Loader\Configurator\Routes;
 Route::middleware("auth:sanctum")->group(function () {});
 
 Route::post("/register", [AuthController::class, "register"]);
+Route::post("/login", [AuthController::class, "login"]);
 
 Route::prefix("categories")->group(function () {
     Route::get("/", [CategoryController::class, "index"]);

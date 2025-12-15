@@ -24,7 +24,7 @@ class User extends Authenticatable
         ];
     }
 
-    public static function generateUsername(string $phone = null): string
+    public static function generateUsername($phone = null): string
     {
         $last4 = $phone ? substr($phone, -4) : rand(1000, 9999);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegistrationRequest;
+use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Hash;
@@ -30,6 +31,33 @@ class AuthController extends Controller
                 "token" => $user->createToken("API TOKEN")->plainTextToken,
             ],
             "Signup successful",
+        );
+    }
+    
+    public function login(LoginRequest $request)
+    {
+        $login = $request->login;
+    
+        $user = User::where(function ($query) use ($login) {
+            $query->where('email', $login)
+                  ->orWhere('username', $login)
+                  ->orWhere('phone', $login);
+        })->first();
+    
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return apiResponse(
+                ['message' => 'Invalid credentials'],
+                'Authentication failed',
+                401
+            );
+        }
+    
+        return apiResponse(
+            [
+                'user' => new UserResource($user),
+                'token' => $user->createToken('API TOKEN')->plainTextToken,
+            ],
+            'Login successful'
         );
     }
 }
