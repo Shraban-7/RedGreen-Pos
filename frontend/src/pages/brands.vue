@@ -388,7 +388,7 @@ const API_URL = "http://pos.test/api/brands"
 
 const brands = ref([])
 const brandName = ref("")
-const brandStatus = ref("1") // Default to active
+const brandStatus = ref("1") 
 const editMode = ref(false)
 const editSlug = ref(null)
 const currentBrand = ref(null)

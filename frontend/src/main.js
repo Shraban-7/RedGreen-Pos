@@ -9,11 +9,15 @@ import { faUserSecret, faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import ToastService from 'primevue/toastservice'
 import Toast from 'primevue/toast';
+import { createPinia } from 'pinia';
 
 library.add(faUserSecret, faCoffee);
 
+const pinia = createPinia();
+
 const app = createApp(App)
 
+app.use(pinia)
 app.use(router)
 app.use(PrimeVue, {
     theme: {

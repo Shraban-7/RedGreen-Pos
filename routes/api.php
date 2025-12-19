@@ -1,13 +1,18 @@
 <?php
 
+use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use Symfony\Component\Routing\Loader\Configurator\Routes;
 
-Route::middleware("auth:sanctum")->group(function () {});
+Route::middleware("auth:sanctum")->group(function () {
+    Route::get('/user', function (Request $request) {
+        return apiResponse(new UserResource($request->user()));
+    });
+});
 
 Route::post("/register", [AuthController::class, "register"]);
 Route::post("/login", [AuthController::class, "login"]);

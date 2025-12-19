@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserRegistrationRequest;
+use Hash;
+use Validator;
+use App\Models\User;
+use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
-use App\Models\User;
-use Hash;
-use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\UserRegistrationRequest;
 
 class AuthController extends Controller
 {
@@ -60,4 +61,12 @@ class AuthController extends Controller
             'Login successful'
         );
     }
+
+    public function logout()
+    {
+        Auth::user()->tokens()->delete();
+
+        return successResponse('Logged out successfully.');
+    }
+
 }
