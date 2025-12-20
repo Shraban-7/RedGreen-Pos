@@ -44,11 +44,31 @@
           <i class="pi pi-plus text-xs"></i>
           <span>New Sale</span>
         </button>
+
+        <!-- Logout Button -->
+        <button
+          @click="logout"
+          class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hover:shadow-lg transition-all duration-200 font-medium text-sm flex items-center gap-2 ml-2"
+        >
+          <i class="pi pi-sign-out text-xs"></i>
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   </header>
 </template>
 
-<script setup></script>
+<script setup>
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+
+const auth = useAuthStore()
+const router = useRouter()
+
+const logout = () => {
+  auth.logout() 
+  router.push('/login') 
+}
+</script>
 
 <style scoped></style>
