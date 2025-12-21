@@ -52,7 +52,7 @@ class ProductService
         return $this->productRepo->update($product->id, $data);
     }
 
-    public function delete(Product $product)
+    public function deleteProduct(Product $product)
     {
         return $this->productRepo->delete($product->id);
     }
