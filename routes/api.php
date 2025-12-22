@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Route;
@@ -31,4 +32,12 @@ Route::prefix("brands")->group(function () {
     Route::get("/{slug}", [BrandController::class, "show"]);
     Route::put("/{slug}", [BrandController::class, "update"]);
     Route::delete("/{slug}", [BrandController::class, "destroy"]);
+});
+
+Route::prefix("products")->group(function () {
+    Route::get("/", [ProductController::class, "index"]);
+    Route::post("/", [ProductController::class, "store"]);
+    Route::get("/{slug}", [ProductController::class, "show"]);
+    Route::put("/{slug}", [ProductController::class, "update"]);
+    Route::delete("/{slug}", [ProductController::class, "destroy"]);
 });

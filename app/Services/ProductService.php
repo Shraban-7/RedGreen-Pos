@@ -1,19 +1,18 @@
 <?php
 
 namespace App\Services;
-
 use App\Models\Product;
 use App\Repositories\Product\ProductRepositoryInterface;
 
 class ProductService
 {
-    protected $productRepo;
+    private $productRepo;
     public function __construct(ProductRepositoryInterface $productRepo)
     {
         $this->productRepo = $productRepo;
     }
 
-    public function getAll()
+    public function getProducts()
     {
         return $this->productRepo->paginate();
     }

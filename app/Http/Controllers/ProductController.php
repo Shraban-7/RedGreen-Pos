@@ -4,20 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
-use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     private $productService;
-    public function __construct(Product $productService)
+    public function __construct(ProductService $productService)
     {
         $this->productService = $productService;
     }
 
      public function index()
     {
-        $products = $this->productService->getAll();
+        $products = $this->productService->getProducts();
 
         return apiResourceResponse(
             ProductResource::collection($products),
