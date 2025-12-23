@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SupplierController;
 use Symfony\Component\Routing\Loader\Configurator\Routes;
 
 Route::middleware("auth:sanctum")->group(function () {
@@ -41,3 +42,5 @@ Route::prefix("products")->group(function () {
     Route::put("/{slug}", [ProductController::class, "update"]);
     Route::delete("/{slug}", [ProductController::class, "destroy"]);
 });
+
+Route::apiResource('suppliers', SupplierController::class);
