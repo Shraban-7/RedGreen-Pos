@@ -26,16 +26,15 @@ class SupplierService
 
     public function showSupplier(Supplier $supplier)
     {
-        return $this->supplierRepository->find($supplier->id);
+        return $this->supplierRepository->findById($supplier->id);
     }
 
     public function updateSupplier(Supplier $supplier, array $data): Supplier
     {
-        $this->supplierRepository->update($supplier, $data);
+        $this->supplierRepository->updateSupplier($supplier->id, $data);
 
         return $supplier->fresh();
     }
-
 
     public function deleteSupplier(Supplier $supplier)
     {

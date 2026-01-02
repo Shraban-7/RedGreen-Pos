@@ -16,9 +16,9 @@ class SupplierRepository implements SupplierRepositoryInterface
         return Supplier::latest()->paginate($limit);
     }
 
-    public function find($id)
+    public function findById($id)
     {
-        return Supplier::findOrFail($id);
+        return Supplier::find($id);
     }
 
     public function create(array $data)
@@ -26,16 +26,16 @@ class SupplierRepository implements SupplierRepositoryInterface
         return Supplier::create($data);
     }
 
-    public function update($id, array $data)
+    public function updateSupplier($id, array $data)
     {
-        $supplier = $this->find($id);
+        $supplier = Supplier::find($id);
         $supplier->update($data);
         return $supplier;
     }
 
     public function delete($id)
     {
-        $supplier = $this->find($id);
+        $supplier = $this->findById($id);
         return $supplier->delete();
     }
 }
