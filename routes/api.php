@@ -33,6 +33,7 @@ Route::prefix("brands")->group(function () {
     Route::get("/{slug}", [BrandController::class, "show"]);
     Route::put("/{slug}", [BrandController::class, "update"]);
     Route::delete("/{slug}", [BrandController::class, "destroy"]);
+    Route::put("/{slug}/status", [BrandController::class, "status"]);
 });
 
 Route::prefix("products")->group(function () {

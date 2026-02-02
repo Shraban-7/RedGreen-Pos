@@ -55,4 +55,10 @@ class BrandService
     {
         return $this->brandRepo->delete($brand->id);
     }
+
+    public function updateStatus(Brand $brand, $status)
+    {
+        return $this->brandRepo->updateStatusBySlug($brand->slug, $status);
+    }
+
 }

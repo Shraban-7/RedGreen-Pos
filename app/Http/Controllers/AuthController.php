@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Hash;
 use Validator;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
@@ -34,17 +35,17 @@ class AuthController extends Controller
             "Signup successful",
         );
     }
-    
+
     public function login(LoginRequest $request)
     {
         $login = $request->login;
-    
+
         $user = User::where(function ($query) use ($login) {
             $query->where('email', $login)
-                  ->orWhere('username', $login)
-                  ->orWhere('phone', $login);
+                ->orWhere('username', $login)
+                ->orWhere('phone', $login);
         })->first();
-    
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             return apiResponse(
                 ['message' => 'Invalid credentials'],
@@ -52,7 +53,7 @@ class AuthController extends Controller
                 401
             );
         }
-    
+
         return apiResponse(
             [
                 'user' => new UserResource($user),
@@ -67,6 +68,31 @@ class AuthController extends Controller
         Auth::user()->tokens()->delete();
 
         return successResponse('Logged out successfully.');
+    }
+
+    public function refresh(Request $request)
+    {
+        $request->validate([
+            'refresh_token' => 'required'
+        ]);
+
+        $user = User::where('refresh_token', $request->refresh_token)->first();
+
+        $user->tokens()->delete();
+        $newToken = $user->createToken('auth_token')->plainTextToken;
+
+        $newRefreshToken = Str::random(64);
+        $user->refresh_token = $newRefreshToken;
+        $user->save();
+
+        return apiResponse(
+            [
+                'user' => new UserResource($user),
+                'token' => $user->createToken('API TOKEN')->plainTextToken,
+            ],
+            'Login successful'
+        );
+
     }
 
 }

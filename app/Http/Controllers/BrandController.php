@@ -75,4 +75,20 @@ class BrandController extends Controller
 
         return successResponse('Brand deleted successfully', 200);
     }
+
+    public function status(Request $request, $slug)
+    {
+        $request->validate([
+            'status' => 'required|boolean'
+        ]);
+
+        $brand = $this->brandService->findBySlug($slug);
+        if (!$brand) {
+            errorResponse('Brand not found.');
+        }
+
+        $updated = $this->brandService->updateStatus($brand, $request->status);
+
+        return successResponse('Brand ' . $updated->status . ' successfully');
+    }
 }

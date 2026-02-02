@@ -5,7 +5,7 @@ export const menuLinks = [
     icon: "pi pi-home",
   },
   {
-    name: "Products",
+    name: "products",
     path: "/products",
     icon: "pi pi-box",
   },
@@ -23,6 +23,11 @@ export const menuLinks = [
     name: "Orders",
     path: "/orders",
     icon: "pi pi-shopping-cart",
+  },
+  {
+    name: "suppliers",
+    path: "/suppliers",
+    icon: "pi pi-warehouse",
   },
   {
     name: "Reports",

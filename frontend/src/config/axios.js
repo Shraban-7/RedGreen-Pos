@@ -5,17 +5,30 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    }
+    },
+    timeout: 15000
 })
 
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
+    },
+    (error) => Promise.reject(error)
+)
 
-api.interceptors.request.use(config => {
-    const token = localStorage.getItem('token')
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token')
+            window.location.href = '/login'
+        }
+        return Promise.reject(error)
     }
-    return config
-})
+)
 
 export default api
-

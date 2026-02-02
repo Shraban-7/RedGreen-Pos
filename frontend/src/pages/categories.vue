@@ -1,372 +1,459 @@
-<template>
-    <div class="min-h-screen">
-        <Toast position="top-right" />
-
-        <!-- Header -->
-        <div class="mb-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Categories</h1>
-                    <p class="text-gray-600">Manage your product categories</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <!-- View Toggle -->
-                    <div class="flex bg-gray-100 p-1 rounded-lg">
-                        <button @click="viewMode = 'list'" class="px-3 py-1.5 rounded-md transition"
-                            :class="viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-800'">
-                            <i class="pi pi-list"></i>
-                        </button>
-                        <button @click="viewMode = 'grid'" class="px-3 py-1.5 rounded-md transition"
-                            :class="viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-800'">
-                            <i class="pi pi-th-large"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">
-                    {{ editMode ? 'Edit Category' : 'Create Category' }}
-                </h2>
-                <div class="w-3 h-3 rounded-full" :class="editMode ? 'bg-yellow-500' : 'bg-green-500'"></div>
-            </div>
-
-            <form @submit.prevent="editMode ? updateCategory() : addCategory()" class="space-y-4">
-                <div>
-                    <input type="text" v-model="categoryName" placeholder="Enter category name"
-                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
-                        required />
-                </div>
-
-                <div class="flex gap-2">
-                    <button type="submit"
-                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2">
-                        <i class="pi" :class="editMode ? 'pi-check' : 'pi-plus'"></i>
-                        {{ editMode ? 'Update' : 'Add Category' }}
-                    </button>
-
-                    <button v-if="editMode" type="button" @click="cancelEdit"
-                        class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 rounded-lg transition flex items-center justify-center gap-2">
-                        <i class="pi pi-times"></i>
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Stats & Search -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:col-span-2">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-500">Total Categories</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ categories.length }}</p>
-                    </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <i class="pi pi-tags text-blue-600"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:col-span-2">
-                <div class="relative">
-                    <i class="pi pi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" v-model="searchQuery" placeholder="Search categories by name or slug..."
-                        class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
-                </div>
-            </div>
-        </div>
-
-        <!-- Categories Container -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <!-- Header -->
-            <div class="px-5 py-4 border-b border-gray-200">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
-                        <i class="pi" :class="viewMode === 'list' ? 'pi-list' : 'pi-th-large'"></i>
-                        All Categories
-                        <span class="text-sm font-normal text-gray-500">
-                            ({{ filteredCategories.length }} items)
-                        </span>
-                    </h3>
-
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm text-gray-500">
-                            View: {{ viewMode === 'list' ? 'List' : 'Grid' }}
-                        </span>
-                        <button @click="fetchCategories"
-                            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
-                            title="Refresh">
-                            <i class="pi pi-refresh"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- List View -->
-            <div v-if="viewMode === 'list' && filteredCategories.length > 0">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                ID
-                            </th>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Category
-                            </th>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Slug
-                            </th>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <tr v-for="cat in filteredCategories" :key="cat.id" class="hover:bg-gray-50 transition-colors"
-                            :class="editSlug === cat.slug ? 'bg-blue-50' : ''">
-                            <td class="py-4 px-6">
-                                <span class="font-mono text-sm text-gray-600">#{{ cat.id }}</span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <i class="pi pi-folder text-gray-600"></i>
-                                    </div>
-                                    <span class="font-medium text-gray-900">{{ cat.name }}</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                                    {{ cat.slug }}
-                                </span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <div class="flex gap-2">
-                                    <button @click="editCategory(cat)"
-                                        class="px-4 py-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-lg transition flex items-center gap-2"
-                                        title="Edit">
-                                        <i class="pi pi-pencil"></i>
-                                        <span class="hidden sm:inline">Edit</span>
-                                    </button>
-                                    <button @click="deleteCategory(cat.slug)"
-                                        class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition flex items-center gap-2"
-                                        title="Delete">
-                                        <i class="pi pi-trash"></i>
-                                        <span class="hidden sm:inline">Delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Grid View -->
-            <div v-else-if="viewMode === 'grid' && filteredCategories.length > 0" class="p-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    <div v-for="cat in filteredCategories" :key="cat.id"
-                        class="border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all duration-200 group"
-                        :class="editSlug === cat.slug ? 'bg-blue-50 border-blue-300' : ''">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-12 h-12 bg-linear-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                                    <i class="pi pi-folder text-blue-600 text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 truncate">{{ cat.name }}</h4>
-                                    <p class="text-xs text-gray-500 mt-1 font-mono">{{ cat.slug }}</p>
-                                </div>
-                            </div>
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div class="flex gap-1">
-                                    <button @click="editCategory(cat)"
-                                        class="w-8 h-8 flex items-center justify-center bg-white hover:bg-yellow-50 text-yellow-600 rounded-lg transition shadow-sm"
-                                        title="Edit">
-                                        <i class="pi pi-pencil text-sm"></i>
-                                    </button>
-                                    <button @click="deleteCategory(cat.slug)"
-                                        class="w-8 h-8 flex items-center justify-center bg-white hover:bg-red-50 text-red-600 rounded-lg transition shadow-sm"
-                                        title="Delete">
-                                        <i class="pi pi-trash text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div v-else class="py-16 text-center">
-                <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                    <i class="pi pi-inbox text-gray-400 text-3xl"></i>
-                </div>
-                <h4 class="text-lg font-medium text-gray-700 mb-2">No categories found</h4>
-                <p class="text-gray-500 mb-6 max-w-md mx-auto">
-                    {{
-                        searchQuery
-                            ? 'No categories match your search. Try different keywords.'
-                            : 'Start by adding your first category using the form above.'
-                    }}
-                </p>
-                <button v-if="searchQuery" @click="searchQuery = ''"
-                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition inline-flex items-center gap-2">
-                    <i class="pi pi-times"></i>
-                    Clear Search
-                </button>
-            </div>
-
-            <!-- Footer -->
-            <div v-if="filteredCategories.length > 0" class="px-5 py-3 border-t border-gray-200 bg-gray-50">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="text-sm text-gray-600">
-                        Showing <span class="font-medium">{{ filteredCategories.length }}</span>
-                        of <span class="font-medium">{{ categories.length }}</span> categories
-                        <span v-if="searchQuery" class="ml-2 text-gray-500">
-                            • Filtered by "{{ searchQuery }}"
-                        </span>
-                    </div>
-                    <div class="text-sm text-gray-500">
-                        View: <span class="font-medium">{{ viewMode === 'list' ? 'List' : 'Grid' }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</template>
-
 <script setup>
-import { ref, onMounted, computed } from "vue"
-import axios from "axios"
-import { useToast } from 'primevue/usetoast'
+import { ref, computed, onMounted } from "vue";
+import { useToast } from "primevue/usetoast";
+import Dialog from "primevue/dialog"; // ✅ import locally (recommended)
+import { useApi } from "@/composables/useApi";
 
-const toast = useToast()
-const API_URL = "http://pos.test/api/categories"
+const toast = useToast();
+const api = useApi();
 
-// State
-const categories = ref([])
-const categoryName = ref("")
-const editMode = ref(false)
-const editSlug = ref(null)
-const searchQuery = ref("")
-const viewMode = ref("grid") // 'list' or 'grid'
+// ─────────────────────────────
+// STATE
+// ─────────────────────────────
+const categories = ref([]);
+const searchQuery = ref("");
+const searchSlug = ref("");
+const filterOpen = ref(false);
+const viewMode = ref("grid");
 
-// Computed
-const filteredCategories = computed(() => {
-    if (!searchQuery.value) return categories.value
-    const query = searchQuery.value.toLowerCase()
-    return categories.value.filter(cat =>
-        cat.name.toLowerCase().includes(query) ||
-        cat.slug.toLowerCase().includes(query)
-    )
-})
+// Add/Edit modal
+const modalVisible = ref(false);
+const form = ref({ name: "" });
+const editMode = ref(false);
+const editSlug = ref(null);
 
-// Methods
+// Delete modal
+const deleteModalOpen = ref(false);
+const selectedCategory = ref(null);
+
+// ─────────────────────────────
+// FETCH
+// ─────────────────────────────
 const fetchCategories = async () => {
-    try {
-        const res = await axios.get(API_URL)
-        categories.value = res.data.data
-    } catch (err) {
-        showError('Failed to load categories')
+  try {
+    const res = await api.get("/categories");
+    categories.value = res.data.data;
+  } catch (err) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Failed to load categories",
+      life: 3000,
+    });
+  }
+};
+
+// ─────────────────────────────
+// FILTER
+// ─────────────────────────────
+const filteredCategories = computed(() => {
+  return categories.value.filter((cat) => {
+    const nameMatch =
+      !searchQuery.value ||
+      cat.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+
+    const slugMatch =
+      !searchSlug.value ||
+      cat.slug.toLowerCase().includes(searchSlug.value.toLowerCase());
+
+    return nameMatch && slugMatch;
+  });
+});
+
+const applyFilters = () => {
+  filterOpen.value = false;
+};
+
+const resetFilters = () => {
+  searchQuery.value = "";
+  searchSlug.value = "";
+  filterOpen.value = false;
+};
+
+// ─────────────────────────────
+// ADD / EDIT MODAL
+// ─────────────────────────────
+const openCreateModal = () => {
+  form.value.name = "";
+  editMode.value = false;
+  editSlug.value = null;
+  modalVisible.value = true;
+};
+
+const openEditModal = (cat) => {
+  form.value.name = cat.name;
+  editMode.value = true;
+  editSlug.value = cat.slug;
+  modalVisible.value = true;
+};
+
+const closeCategoryModal = () => {
+  modalVisible.value = false;
+  form.value.name = "";
+  editMode.value = false;
+  editSlug.value = null;
+};
+
+// ─────────────────────────────
+// SAVE (CREATE / UPDATE)
+// ─────────────────────────────
+const saveCategory = async () => {
+  if (!form.value.name?.trim()) {
+    toast.add({
+      severity: "warn",
+      summary: "Validation",
+      detail: "Category name is required",
+      life: 2500,
+    });
+    return;
+  }
+
+  try {
+    if (editMode.value) {
+      const res = await api.put(`/categories/${editSlug.value}`, {
+        name: form.value.name,
+      });
+
+      const idx = categories.value.findIndex((c) => c.slug === editSlug.value);
+      if (idx !== -1) categories.value[idx] = res.data.data;
+
+      toast.add({
+        severity: "success",
+        summary: "Updated",
+        detail: "Category updated successfully",
+        life: 2500,
+      });
+    } else {
+      const res = await api.post("/categories", { name: form.value.name });
+      categories.value.push(res.data.data);
+
+      toast.add({
+        severity: "success",
+        summary: "Created",
+        detail: "Category added successfully",
+        life: 2500,
+      });
     }
-}
 
-const addCategory = async () => {
-    try {
-        const res = await axios.post(API_URL, { name: categoryName.value })
-        categories.value.push(res.data.data)
-        categoryName.value = ""
-        showSuccess('Category added successfully')
-    } catch (err) {
-        showError('Failed to add category')
-    }
-}
+    closeCategoryModal();
+  } catch (err) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Request failed",
+      life: 3000,
+    });
+  }
+};
 
-const editCategory = (cat) => {
-    categoryName.value = cat.name
-    editMode.value = true
-    editSlug.value = cat.slug
-}
+// ─────────────────────────────
+// DELETE MODAL
+// ─────────────────────────────
+const confirmDelete = (cat) => {
+  selectedCategory.value = cat;
+  deleteModalOpen.value = true;
+};
 
-const updateCategory = async () => {
-    try {
-        const res = await axios.put(`${API_URL}/${editSlug.value}`, { name: categoryName.value })
-        const index = categories.value.findIndex(cat => cat.slug === editSlug.value)
-        if (index !== -1) categories.value[index] = res.data.data
-        cancelEdit()
-        showSuccess('Category updated successfully')
-    } catch (err) {
-        showError('Failed to update category')
-    }
-}
+const deleteSelected = async () => {
+  if (!selectedCategory.value?.slug) return;
 
-const cancelEdit = () => {
-    categoryName.value = ""
-    editMode.value = false
-    editSlug.value = null
-}
+  try {
+    await api.delete(`/categories/${selectedCategory.value.slug}`);
+    categories.value = categories.value.filter(
+      (c) => c.slug !== selectedCategory.value.slug
+    );
 
-const deleteCategory = async (slug) => {
-    if (!confirm('Are you sure you want to delete this category?')) return
+    toast.add({
+      severity: "success",
+      summary: "Deleted",
+      detail: "Category deleted",
+      life: 2500,
+    });
 
-    try {
-        await axios.delete(`${API_URL}/${slug}`)
-        categories.value = categories.value.filter(cat => cat.slug !== slug)
-        showSuccess('Category deleted successfully')
-    } catch (err) {
-        showError('Failed to delete category')
-    }
-}
+    deleteModalOpen.value = false;
+    selectedCategory.value = null;
+  } catch (err) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Failed to delete",
+      life: 3000,
+    });
+  }
+};
 
-// Toast helpers
-const showSuccess = (message) => {
-    toast.add({ severity: 'success', summary: 'Success', detail: message, life: 3000 })
-}
-
-const showError = (message) => {
-    toast.add({ severity: 'error', summary: 'Error', detail: message, life: 4000 })
-}
-
-// Lifecycle
-onMounted(fetchCategories)
+// ─────────────────────────────
+// INIT
+// ─────────────────────────────
+onMounted(fetchCategories);
 </script>
 
+<template>
+  <div class="min-h-screen flex flex-col">
+    <!-- PAGE HEADER -->
+    <div class="mb-4 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Categories</h1>
+        <p class="text-gray-500">Manage and organize your product categories</p>
+      </div>
+
+      <div class="flex gap-3">
+        <!-- VIEW TOGGLE -->
+        <div class="flex bg-gray-100 p-1 rounded-xl shadow-sm">
+          <button
+            @click="viewMode = 'list'"
+            class="px-3 py-1.5 rounded-lg transition font-medium"
+            :class="
+              viewMode === 'list'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            "
+          >
+            <i class="pi pi-list"></i>
+          </button>
+
+          <button
+            @click="viewMode = 'grid'"
+            class="px-3 py-1.5 rounded-lg transition font-medium"
+            :class="
+              viewMode === 'grid'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            "
+          >
+            <i class="pi pi-th-large"></i>
+          </button>
+        </div>
+
+        <!-- FILTER BUTTON -->
+        <button
+          @click="filterOpen = !filterOpen"
+          class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-2"
+        >
+          <i class="pi pi-filter"></i>
+          Filter
+          <i class="pi" :class="filterOpen ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+        </button>
+
+        <!-- ADD CATEGORY -->
+        <button
+          @click="openCreateModal"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-md flex items-center gap-2"
+        >
+          <i class="pi pi-plus"></i>
+          Add
+        </button>
+      </div>
+    </div>
+
+    <!-- SLIDE-DOWN FILTER -->
+    <transition name="slide-fade">
+      <div v-if="filterOpen" class="bg-white rounded-xl shadow-md border border-gray-200 p-5 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label class="text-sm font-medium text-gray-700">Category Name</label>
+            <input
+              v-model="searchQuery"
+              type="text"
+              class="mt-1 w-full px-4 py-2 rounded-lg border bg-gray-50"
+              placeholder="Type category name..."
+            />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-gray-700">Slug</label>
+            <input
+              v-model="searchSlug"
+              type="text"
+              class="mt-1 w-full px-4 py-2 rounded-lg border bg-gray-50"
+              placeholder="Type slug..."
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button @click="resetFilters" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">
+            Reset
+          </button>
+          <button @click="applyFilters" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow">
+            Apply Filters
+          </button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- MAIN CONTENT -->
+    <div class="bg-white rounded-xl shadow-md">
+      <!-- LIST VIEW -->
+      <div v-if="viewMode === 'list' && filteredCategories.length" class="overflow-x-auto">
+        <table class="min-w-full bg-transparent">
+          <thead class="bg-gray-50 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+            <tr>
+              <th class="py-3 px-6 text-left">ID</th>
+              <th class="py-3 px-6 text-left">Category</th>
+              <th class="py-3 px-6 text-left">Slug</th>
+              <th class="py-3 px-6 text-left">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+            <tr v-for="cat in filteredCategories" :key="cat.id" class="hover:bg-gray-50 transition">
+              <td class="py-4 px-6 font-mono text-gray-700">#{{ cat.id }}</td>
+
+              <td class="py-4 px-6 flex items-center gap-3 font-medium text-gray-900">
+                <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <i class="pi pi-folder text-blue-600"></i>
+                </div>
+                {{ cat.name }}
+              </td>
+
+              <td class="py-4 px-6">
+                <span class="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-600">
+                  {{ cat.slug }}
+                </span>
+              </td>
+
+              <td class="py-4 px-6 flex gap-2">
+                <button
+                  @click="openEditModal(cat)"
+                  class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-xl hover:bg-yellow-200"
+                >
+                  <i class="pi pi-pencil"></i>
+                </button>
+
+                <button
+                  @click="confirmDelete(cat)"
+                  class="px-4 py-2 bg-red-100 text-red-700 rounded-xl hover:bg-red-200"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- GRID VIEW -->
+      <div
+        v-else-if="viewMode === 'grid'"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6"
+      >
+        <div
+          v-for="cat in filteredCategories"
+          :key="cat.id"
+          class="p-6 rounded-2xl bg-gray-50 shadow-sm hover:shadow-lg transition"
+        >
+          <h4 class="font-semibold text-gray-900">{{ cat.name }}</h4>
+          <p class="text-xs text-gray-500">{{ cat.slug }}</p>
+
+          <div class="flex gap-2 mt-4">
+            <button
+              @click="openEditModal(cat)"
+              class="flex-1 py-2 bg-yellow-100 text-yellow-700 rounded-xl hover:bg-yellow-200"
+            >
+              <i class="pi pi-pencil"></i> Edit
+            </button>
+
+            <button
+              @click="confirmDelete(cat)"
+              class="flex-1 py-2 bg-red-100 text-red-700 rounded-xl hover:bg-red-200"
+            >
+              <i class="pi pi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPTY -->
+      <div v-else class="text-center py-16 text-gray-500">
+        <i class="pi pi-inbox text-4xl"></i>
+        <p class="mt-4 text-lg font-medium">No categories found.</p>
+      </div>
+    </div>
+
+    <!-- ✅ ADD / EDIT MODAL -->
+    <Dialog
+      v-model:visible="modalVisible"
+      :modal="true"
+      :draggable="false"
+      :closable="true"
+      class="w-full md:w-1/3"
+      :header="editMode ? 'Edit Category' : 'Add Category'"
+      @hide="closeCategoryModal"
+    >
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Category Name</label>
+          <input
+            v-model="form.name"
+            type="text"
+            class="mt-1 w-full px-4 py-2 rounded-lg border bg-gray-50"
+            placeholder="Enter category name..."
+          />
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button
+            type="button"
+            class="px-5 py-2 bg-gray-200 rounded-xl hover:bg-gray-300"
+            @click="closeCategoryModal"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+            @click="saveCategory"
+          >
+            <i class="pi" :class="editMode ? 'pi-check' : 'pi-plus'"></i>
+            {{ editMode ? "Update" : "Create" }}
+          </button>
+        </div>
+      </div>
+    </Dialog>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <Dialog
+      v-model:visible="deleteModalOpen"
+      header="Confirm Delete"
+      :modal="true"
+      :draggable="false"
+      class="w-full md:w-1/3"
+    >
+      <p class="text-gray-700">
+        Are you sure you want to delete
+        <strong class="text-red-600">{{ selectedCategory?.name }}</strong>?
+      </p>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button
+          @click="deleteModalOpen = false"
+          class="px-5 py-2 bg-gray-200 rounded-xl hover:bg-gray-300"
+        >
+          Cancel
+        </button>
+
+        <button
+          @click="deleteSelected"
+          class="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700"
+        >
+          Delete
+        </button>
+      </div>
+    </Dialog>
+  </div>
+</template>
+
 <style scoped>
-/* Custom scrollbar for table */
-table {
-    min-width: 100%;
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.35s ease-in-out;
 }
 
-/* Smooth transitions */
-tr {
-    transition: background-color 0.15s ease;
-}
-
-.group:hover .group-hover\:scale-105 {
-    transform: scale(1.05);
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    .grid-cols-4 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-/* Focus styles */
-button:focus-visible {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-}
-
-input:focus-visible {
-    outline: 2px solid #3b82f6;
-    outline-offset: 0;
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

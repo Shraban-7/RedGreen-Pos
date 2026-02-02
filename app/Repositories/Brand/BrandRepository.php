@@ -44,4 +44,11 @@ class BrandRepository implements BrandRepositoryInterface
         $brand = $this->find($id);
         return $brand->delete();
     }
+
+    public function updateStatusBySlug($slug, $status)
+    {
+        $brand = Brand::where('slug', $slug)->firstOrFail();
+        $brand->update(['status' => $status]);
+        return $brand;
+    }
 }

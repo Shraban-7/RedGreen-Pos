@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import ToastService from 'primevue/toastservice'
 import Toast from 'primevue/toast';
 import { createPinia } from 'pinia';
+import api from './config/axios';
 
 library.add(faUserSecret, faCoffee);
 
@@ -33,4 +34,5 @@ app.use(ToastService)
 app.component('Toast', Toast)
 app.component('font-awesome-icon', FontAwesomeIcon);
 
+app.config.globalProperties.$api = api;
 app.mount('#app')
