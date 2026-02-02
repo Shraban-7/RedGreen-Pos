@@ -1,116 +1,108 @@
 <template>
-    <aside :class="[
-        'bg-gray-900 border-r border-gray-800',
-        'transition-all duration-300 ease-in-out',
-        'relative z-20 shadow-xl shadow-black/40',
-        collapsed ? 'w-20' : 'w-64'
-    ]">
-        <!-- Logo -->
-        <div class="h-16 flex items-center justify-center border-b border-gray-800">
-            <transition name="fade">
-                <div v-if="!collapsed" class="flex items-center gap-3 px-6">
-                    <div
-                        class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-900/40">
-                        <i class="pi pi-shop text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold text-white">POS</h1>
-                        <p class="text-xs text-gray-400">Management</p>
-                    </div>
-                </div>
+  <aside
+    :class="[
+      'h-screen flex flex-col shadow-xl transition-all duration-300 fixed md:static left-0 top-0 z-40',
+      'bg-[#131722] text-gray-100',
+      collapsed ? 'w-20' : 'w-64'
+    ]"
+  >
 
-                <div v-else
-                    class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-900/40">
-                    <i class="fa-solid fa-store text-white text-lg"></i>
-                </div>
-            </transition>
+    <!-- Logo -->
+    <div class="h-16 flex items-center justify-between px-4 border-b border-gray-800">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <i class="pi pi-shopping-bag text-white"></i>
         </div>
 
-        <!-- Menu -->
-        <nav class="mt-4 px-3 space-y-1">
-            <router-link v-for="link in links" :key="link.name" :to="link.path" class="block">
-                <div :class="[
-                    'flex items-center gap-3 px-4 py-3 rounded-lg group transition-all',
-                    isActive(link.path)
-                        ? 'bg-gray-800 shadow-lg'
-                        : 'hover:bg-gray-800/70 hover:shadow'
-                ]">
-                    <i :class="[
-                        link.icon,
-                        'text-lg',
-                        isActive(link.path)
-                            ? 'text-indigo-400'
-                            : 'text-gray-400 group-hover:text-indigo-400'
-                    ]"></i>
+        <transition name="fade">
+          <div v-if="!collapsed">
+            <p class="font-bold text-white">POS System</p>
+            <p class="text-xs text-gray-400 -mt-1">Management Panel</p>
+          </div>
+        </transition>
+      </div>
 
-                    <!-- Name (hidden when collapsed) -->
-                    <transition name="fade">
-                        <span v-if="!collapsed" :class="[
-                            'text-sm font-medium transition-colors',
-                            isActive(link.path)
-                                ? 'text-white'
-                                : 'text-gray-300 group-hover:text-white'
-                        ]">
-                            {{ link.name }}
-                        </span>
-                    </transition>
+      <button
+        @click="toggleCollapse"
+        class="hidden md:flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-800 transition"
+      >
+        <i :class="collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
+      </button>
+    </div>
 
-                    <!-- Collapsed tooltip -->
-                    <div v-if="collapsed" class="absolute left-full ml-2 px-3 py-1 bg-black text-white text-xs rounded-md 
-                              opacity-0 group-hover:opacity-100 transition-opacity shadow-xl whitespace-nowrap">
-                        {{ link.name }}
-                    </div>
-                </div>
-            </router-link>
-        </nav>
+    <!-- Menu -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-2">
+      <router-link
+        v-for="item in links"
+        :key="item.name"
+        :to="item.path"
+        class="group block relative"
+      >
+        <div
+          :class="[
+            'flex items-center px-4 py-3 rounded-lg transition-all duration-200',
+            route.path.startsWith(item.path)
+              ? 'bg-indigo-600 text-white shadow-lg'
+              : 'hover:bg-gray-800/80 text-gray-300'
+          ]"
+        >
+          <i :class="['text-lg', item.icon]"></i>
 
-        <!-- Collapse Button -->
-        <button @click="toggleCollapse" class="absolute -right-3 top-20 w-7 h-7 bg-gray-900 border border-gray-700 rounded-full shadow-xl
-                   flex items-center justify-center hover:scale-110 transition-all">
-            <i
-                :class="['text-xs text-gray-300', collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left']"></i>
-        </button>
+          <transition name="fade">
+            <span v-if="!collapsed" class="ml-3 text-sm font-medium">
+              {{ item.name }}
+            </span>
+          </transition>
 
-        <!-- User Profile -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800 bg-gray-800/40">
-            <div :class="['flex items-center gap-3', collapsed ? 'justify-center' : '']">
-                <div
-                    class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow">
-                    JD
-                </div>
-                <transition name="fade">
-                    <div v-if="!collapsed">
-                        <p class="text-sm text-white font-semibold">John Doe</p>
-                        <p class="text-xs text-gray-400">Admin</p>
-                    </div>
-                </transition>
-            </div>
+          <!-- Tooltip (collapsed mode) -->
+          <div
+            v-if="collapsed"
+            class="absolute left-full top-1/2 -translate-y-1/2 ml-2 py-1 px-3 rounded bg-black text-xs text-white
+                   whitespace-nowrap opacity-0 group-hover:opacity-100 transition shadow-lg"
+          >
+            {{ item.name }}
+          </div>
         </div>
-    </aside>
+      </router-link>
+    </nav>
+
+    <!-- Footer -->
+    <div class="p-4 mt-auto border-t border-gray-800">
+      <div class="flex items-center gap-3" :class="collapsed ? 'justify-center' : ''">
+        <img
+          src="https://ui-avatars.com/api/?background=6d28d9&color=fff&name=Admin"
+          class="w-10 h-10 rounded-full shadow"
+        />
+        <transition name="fade">
+          <div v-if="!collapsed">
+            <p class="font-semibold text-white text-sm">Admin</p>
+            <p class="text-xs text-gray-400">Manager</p>
+          </div>
+        </transition>
+      </div>
+    </div>
+  </aside>
 </template>
 
 <script setup>
-import { ref } from "vue"
-import { useRoute } from "vue-router"
-import { menuLinks } from "@/config/sidebarLinks"
+import { ref } from "vue";
+import { useRoute } from "vue-router";
+import { menuLinks } from "@/config/sidebarLinks";
 
-const collapsed = ref(false)
-const links = menuLinks
-const route = useRoute()
+const collapsed = ref(false);
+const route = useRoute();
+const links = menuLinks;
 
-const toggleCollapse = () => (collapsed.value = !collapsed.value)
-
-const isActive = (path) => route.path.startsWith(path)
+const toggleCollapse = () => (collapsed.value = !collapsed.value);
 </script>
 
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.15s ease;
+  transition: opacity .2s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
-    opacity: 0;
+  opacity: 0;
 }
 </style>
