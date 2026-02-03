@@ -1,178 +1,347 @@
-<template>
-    <div class="h-screen">
-        <div class="mb-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Suppliers</h1>
-                    <p class="text-gray-600">Manage Suppliers</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <!-- View Toggle -->
-                    <div class="flex bg-gray-100 p-1 rounded-lg">
-                        <button @click="viewMode = 'list'" class="px-3 py-1.5 rounded-md transition"
-                            :class="viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-800'">
-                            <i class="pi pi-list"></i>
-                        </button>
-                        <button @click="viewMode = 'grid'" class="px-3 py-1.5 rounded-md transition"
-                            :class="viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-800'">
-                            <i class="pi pi-th-large"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import { useToast } from "primevue/usetoast";
+import { useApi } from "@/composables/useApi";
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <!-- Header -->
-            <div class="px-5 py-4 border-b border-gray-200">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
-                        <i class="pi" :class="viewMode === 'list' ? 'pi-list' : 'pi-th-large'"></i>
-                        All Categories
-                        <span class="text-sm font-normal text-gray-500">
-                            ({{ filteredCategories.length }} items)
-                        </span>
-                    </h3>
+const api = useApi();
+const toast = useToast();
 
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm text-gray-500">
-                            View: {{ viewMode === 'list' ? 'List' : 'Grid' }}
-                        </span>
-                        <button @click="fetchCategories"
-                            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
-                            title="Refresh">
-                            <i class="pi pi-refresh"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+// Data
+const suppliers = ref([]);
 
-            <!-- List View -->
-            <div v-if="viewMode === 'list' && filteredCategories.length > 0">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                ID
-                            </th>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Category
-                            </th>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Slug
-                            </th>
-                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <tr v-for="cat in filteredCategories" :key="cat.id" class="hover:bg-gray-50 transition-colors"
-                            :class="editSlug === cat.slug ? 'bg-blue-50' : ''">
-                            <td class="py-4 px-6">
-                                <span class="font-mono text-sm text-gray-600">#{{ cat.id }}</span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <i class="pi pi-folder text-gray-600"></i>
-                                    </div>
-                                    <span class="font-medium text-gray-900">{{ cat.name }}</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                                    {{ cat.slug }}
-                                </span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <div class="flex gap-2">
-                                    <button @click="editCategory(cat)"
-                                        class="px-4 py-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-lg transition flex items-center gap-2"
-                                        title="Edit">
-                                        <i class="pi pi-pencil"></i>
-                                        <span class="hidden sm:inline">Edit</span>
-                                    </button>
-                                    <button @click="deleteCategory(cat.slug)"
-                                        class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition flex items-center gap-2"
-                                        title="Delete">
-                                        <i class="pi pi-trash"></i>
-                                        <span class="hidden sm:inline">Delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+// Filters
+const filterOpen = ref(false);
+const searchName = ref("");
+const searchPhone = ref("");
+const searchEmail = ref("");
 
-            <!-- Grid View -->
-            <div v-else-if="viewMode === 'grid' && filteredCategories.length > 0" class="p-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    <div v-for="cat in filteredCategories" :key="cat.id"
-                        class="border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all duration-200 group"
-                        :class="editSlug === cat.slug ? 'bg-blue-50 border-blue-300' : ''">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-12 h-12 bg-linear-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                                    <i class="pi pi-folder text-blue-600 text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 truncate">{{ cat.name }}</h4>
-                                    <p class="text-xs text-gray-500 mt-1 font-mono">{{ cat.slug }}</p>
-                                </div>
-                            </div>
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div class="flex gap-1">
-                                    <button @click="editCategory(cat)"
-                                        class="w-8 h-8 flex items-center justify-center bg-white hover:bg-yellow-50 text-yellow-600 rounded-lg transition shadow-sm"
-                                        title="Edit">
-                                        <i class="pi pi-pencil text-sm"></i>
-                                    </button>
-                                    <button @click="deleteCategory(cat.slug)"
-                                        class="w-8 h-8 flex items-center justify-center bg-white hover:bg-red-50 text-red-600 rounded-lg transition shadow-sm"
-                                        title="Delete">
-                                        <i class="pi pi-trash text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+// Modal
+const modalVisible = ref(false);
+const deleteModalVisible = ref(false);
 
-            <!-- Empty State -->
-            <div v-else class="py-16 text-center">
-                <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                    <i class="pi pi-inbox text-gray-400 text-3xl"></i>
-                </div>
-                <h4 class="text-lg font-medium text-gray-700 mb-2">No suppliers found</h4>
-                <p class="text-gray-500 mb-6 max-w-md mx-auto">
-                    {{
-                        searchQuery
-                            ? 'No suppliers match your search. Try different keywords.'
-                            : 'Start by adding your first category using the form above.'
-                    }}
-                </p>
-                <button v-if="searchQuery" @click="searchQuery = ''"
-                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition inline-flex items-center gap-2">
-                    <i class="pi pi-times"></i>
-                    Clear Search
-                </button>
-            </div>
+// Form state
+const editMode = ref(false);
+const selectedSupplier = ref(null);
+const form = ref({
+  name: "",
+  contact_person: "",
+  phone: "",
+  email: "",
+  address: "",
+});
 
-        </div>
-    </div>
-</template>
+// Fetch all suppliers
+const fetchSuppliers = async () => {
+  try {
+    const res = await api.get("/suppliers");
+    suppliers.value = res.data.data;
+  } catch {
+    toast.add({ severity: "error", summary: "Error", detail: "Failed to load suppliers" });
+  }
+};
 
-<script>
-import { computed, onMounted, ref } from 'vue';
+// Filter suppliers
+const filteredSuppliers = computed(() => {
+  return suppliers.value.filter((sup) => {
+    const matchName = !searchName.value || sup.name?.toLowerCase().includes(searchName.value.toLowerCase());
+    const matchPhone = !searchPhone.value || sup.phone?.toLowerCase().includes(searchPhone.value.toLowerCase());
+    const matchEmail = !searchEmail.value || sup.email?.toLowerCase().includes(searchEmail.value.toLowerCase());
+    return matchName && matchPhone && matchEmail;
+  });
+});
 
-import axios from 'axios';
+const resetFilters = () => {
+  searchName.value = "";
+  searchPhone.value = "";
+  searchEmail.value = "";
+  filterOpen.value = false;
+};
 
+// Modal methods
+const openCreateModal = () => {
+  editMode.value = false;
+  selectedSupplier.value = null;
+  form.value = {
+    name: "",
+    contact_person: "",
+    phone: "",
+    email: "",
+    address: "",
+  };
+  modalVisible.value = true;
+};
 
-    
+const openEditModal = (supplier) => {
+  editMode.value = true;
+  selectedSupplier.value = supplier;
+  form.value = { ...supplier };
+  modalVisible.value = true;
+};
+
+const saveSupplier = async () => {
+  try {
+    if (editMode.value) {
+      const res = await api.put(`/suppliers/${selectedSupplier.value.id}`, form.value);
+
+      const idx = suppliers.value.findIndex((s) => s.id === selectedSupplier.value.id);
+      if (idx !== -1) suppliers.value[idx] = res.data.data;
+
+      toast.add({ severity: "success", summary: "Updated", detail: "Supplier updated" });
+    } else {
+      const res = await api.post(`/suppliers`, form.value);
+      suppliers.value.push(res.data.data);
+
+      toast.add({ severity: "success", summary: "Created", detail: "Supplier added" });
+    }
+
+    modalVisible.value = false;
+  } catch {
+    toast.add({ severity: "error", summary: "Error", detail: "Failed to save supplier" });
+  }
+};
+
+const confirmDelete = (supplier) => {
+  selectedSupplier.value = supplier;
+  deleteModalVisible.value = true;
+};
+
+const deleteSupplier = async () => {
+  try {
+    await api.delete(`/suppliers/${selectedSupplier.value.id}`);
+    suppliers.value = suppliers.value.filter((s) => s.id !== selectedSupplier.value.id);
+
+    toast.add({ severity: "success", summary: "Deleted", detail: "Supplier deleted" });
+    deleteModalVisible.value = false;
+  } catch {
+    toast.add({ severity: "error", summary: "Error", detail: "Failed to delete supplier" });
+  }
+};
+
+onMounted(fetchSuppliers);
 </script>
 
-<style lang="scss" scoped></style>
+<template>
+  <div class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Suppliers</h1>
+        <p class="text-gray-500">Manage your vendor partners</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+
+        <!-- Filters toggle -->
+        <button
+          @click="filterOpen = !filterOpen"
+          class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2"
+        >
+          <i class="pi pi-filter"></i>
+          Filters
+          <i class="pi" :class="filterOpen ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+        </button>
+
+        <!-- Add Supplier -->
+        <button
+          @click="openCreateModal"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow"
+        >
+          <i class="pi pi-plus"></i> Add Supplier
+        </button>
+      </div>
+    </div>
+
+    <!-- Slide Filter -->
+    <transition name="slide-fade">
+      <div v-if="filterOpen" class="bg-white rounded-xl p-5 border shadow-sm mb-6">
+        <div class="grid sm:grid-cols-3 gap-4">
+
+          <div>
+            <label class="text-sm font-medium text-gray-700">Name</label>
+            <input
+              v-model="searchName"
+              class="mt-1 w-full p-2 rounded-lg border bg-gray-50"
+              placeholder="Search name..."
+            />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-gray-700">Phone</label>
+            <input
+              v-model="searchPhone"
+              class="mt-1 w-full p-2 rounded-lg border bg-gray-50"
+              placeholder="Search phone..."
+            />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-gray-700">Email</label>
+            <input
+              v-model="searchEmail"
+              class="mt-1 w-full p-2 rounded-lg border bg-gray-50"
+              placeholder="Search email..."
+            />
+          </div>
+
+        </div>
+
+        <div class="flex justify-end gap-3 mt-4">
+          <button
+            @click="resetFilters"
+            class="px-4 py-2 bg-gray-200 rounded-lg"
+          >
+            Reset
+          </button>
+
+          <button
+            @click="filterOpen = false"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+      <table class="w-full table-auto">
+        <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-600">
+          <tr>
+            <th class="p-4 text-left">ID</th>
+            <th class="p-4 text-left">Name</th>
+            <th class="p-4 text-left">Contact Person</th>
+            <th class="p-4 text-left">Phone</th>
+            <th class="p-4 text-left">Email</th>
+            <th class="p-4 text-left">Address</th>
+            <th class="p-4 text-left">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200 text-sm">
+          <tr
+            v-for="sup in filteredSuppliers"
+            :key="sup.id"
+            class="hover:bg-gray-50 transition"
+          >
+            <td class="p-4 font-mono text-gray-700">#{{ sup.id }}</td>
+            <td class="p-4 font-medium">{{ sup.name || '-' }}</td>
+            <td class="p-4">{{ sup.contact_person || '-' }}</td>
+            <td class="p-4">{{ sup.phone || '-' }}</td>
+            <td class="p-4">{{ sup.email || '-' }}</td>
+            <td class="p-4">{{ sup.address || '-' }}</td>
+
+            <td class="p-4 flex gap-2">
+              <button
+                @click="openEditModal(sup)"
+                class="px-3 py-1.5 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+
+              <button
+                @click="confirmDelete(sup)"
+                class="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div
+        v-if="filteredSuppliers.length === 0"
+        class="text-center py-16 text-gray-500"
+      >
+        <i class="pi pi-inbox text-4xl"></i>
+        <p class="mt-3 font-medium text-lg">No suppliers found</p>
+      </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <Dialog
+      v-model:visible="deleteModalVisible"
+      header="Delete Supplier"
+      :modal="true"
+      :draggable="false"
+    >
+      <p>Do you want to delete "{{ selectedSupplier?.name }}"?</p>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button class="px-4 py-2 bg-gray-200 rounded-lg" @click="deleteModalVisible = false">
+          Cancel
+        </button>
+
+        <button class="px-4 py-2 bg-red-600 text-white rounded-lg" @click="deleteSupplier">
+          Delete
+        </button>
+      </div>
+    </Dialog>
+
+    <!-- Add/Edit Modal -->
+    <Dialog
+      v-model:visible="modalVisible"
+      :header="editMode ? 'Edit Supplier' : 'Add Supplier'"
+      :modal="true"
+      :draggable="false"
+    >
+      <form class="space-y-4" @submit.prevent="saveSupplier">
+
+        <input
+          type="text"
+          v-model="form.name"
+          placeholder="Supplier Name"
+          class="w-full p-3 border rounded-lg"
+        />
+
+        <input
+          type="text"
+          v-model="form.contact_person"
+          placeholder="Contact Person"
+          class="w-full p-3 border rounded-lg"
+        />
+
+        <input
+          type="text"
+          v-model="form.phone"
+          placeholder="Phone"
+          class="w-full p-3 border rounded-lg"
+        />
+
+        <input
+          type="email"
+          v-model="form.email"
+          placeholder="Email"
+          class="w-full p-3 border rounded-lg"
+        />
+
+        <textarea
+          v-model="form.address"
+          rows="3"
+          placeholder="Address"
+          class="w-full p-3 border rounded-lg"
+        ></textarea>
+
+        <button class="w-full py-3 bg-blue-600 text-white rounded-lg">
+          {{ editMode ? "Update Supplier" : "Create Supplier" }}
+        </button>
+
+      </form>
+    </Dialog>
+
+  </div>
+</template>
+
+<style scoped>
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+</style>
