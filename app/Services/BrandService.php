@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use App\Models\Brand;
-use App\Repositories\Brand\BrandRepositoryInterface;
+use App\Repositories\Brand\BrandRepository;
 
 class BrandService
 {
     protected $brandRepo;
 
-    public function __construct(BrandRepositoryInterface $brandRepo)
+    public function __construct(BrandRepository $brandRepo)
     {
         $this->brandRepo = $brandRepo;
     }
@@ -21,7 +21,7 @@ class BrandService
 
     public function findBySlug($slug)
     {
-        return $this->brandRepo->findBySlug($slug);
+        return $this->brandRepo->findBrandBySlug($slug);
     }
 
     public function store($data)
@@ -30,7 +30,7 @@ class BrandService
         if (isset($data['image']) && $data['image']) {
             $data['image'] = upload_file($data['image'], 'brands');
         }
-        return $this->brandRepo->create($data);
+        return $this->brandRepo->createBrand($data);
     }
 
     public function update(Brand $brand, $data)
@@ -47,13 +47,13 @@ class BrandService
             $data['image'] = upload_file($data['image'], 'brands');
         }
 
-        return $this->brandRepo->update($brand->id, $data);
+        return $this->brandRepo->updateBrand($brand->id, $data);
     }
 
 
     public function delete(Brand $brand)
     {
-        return $this->brandRepo->delete($brand->id);
+        return $this->brandRepo->deleteBrand($brand->id);
     }
 
     public function updateStatus(Brand $brand, $status)

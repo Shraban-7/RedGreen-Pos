@@ -28,7 +28,7 @@ class BrandRequest extends FormRequest
                 'required',
                 'string'
             ],
-            'image' => 'nullable|mimes:png,jpg,jpeg,webp,svg,avf|max:4096',
+            'image' => 'nullable|image|max:4096',
             'status' => 'boolean',
         ];
     }

@@ -6,7 +6,7 @@ use App\Models\Brand;
 
 class BrandRepository implements BrandRepositoryInterface
 {
-    public function all()
+    public function getBrands()
     {
         return Brand::latest()->get();
     }
@@ -16,32 +16,32 @@ class BrandRepository implements BrandRepositoryInterface
         return Brand::latest()->paginate($limit);
     }
 
-    public function find($id)
+    public function findBrandById($id)
     {
         return Brand::findOrFail($id);
     }
 
-    public function findBySlug($slug)
+    public function findBrandBySlug($slug)
     {
         return Brand::where('slug', $slug)->first();
     }
 
 
-    public function create(array $data)
+    public function createBrand(array $data)
     {
         return Brand::create($data);
     }
 
-    public function update($id, array $data)
+    public function updateBrand($id, array $data)
     {
-        $brand = $this->find($id);
+        $brand = $this->findBrandById($id);
         $brand->update($data);
         return $brand;
     }
 
-    public function delete($id)
+    public function deleteBrand($id)
     {
-        $brand = $this->find($id);
+        $brand = $this->findBrandById($id);
         return $brand->delete();
     }
 

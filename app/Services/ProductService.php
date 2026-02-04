@@ -25,8 +25,8 @@ class ProductService
     public function store($data)
     {
         $data['slug'] = str_slug('products', 'slug', $data['name']);
-        if (isset($data['image']) && $data['image']) {
-            $data['image'] = upload_file($data['image'], 'brands');
+        if (isset($data['thumbnail']) && $data['thumbnail']) {
+            $data['thumbnail'] = upload_file($data['thumbnail'], 'products');
         }
         $data = $this->prepareProductData($data, true);
         return $this->productRepo->create($data);
@@ -38,12 +38,12 @@ class ProductService
             $data['slug'] = str_slug('products', 'slug', $data['name'], '-', $product->id);
         }
 
-        if (isset($data['image']) && $data['image']) {
+        if (isset($data['thumbnail']) && $data['thumbnail']) {
             if ($product->image) {
                 delete_file($product->image);
             }
 
-            $data['image'] = upload_file($data['image'], 'brands');
+            $data['thumbnail'] = upload_file($data['image'], 'products');
         }
 
         $data = $this->prepareProductData($data, true);
@@ -56,7 +56,7 @@ class ProductService
         return $this->productRepo->delete($product->id);
     }
 
-      protected function prepareProductData(array $data, bool $isUpdate = false): array
+    protected function prepareProductData(array $data, bool $isUpdate = false): array
     {
 
         $data['discount_amount'] = calculate_discount_amount(

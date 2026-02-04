@@ -2,12 +2,11 @@ import axios from 'axios'
 
 const api = axios.create({
     baseURL: 'http://pos.test/api',
+    timeout: 15000,
     headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json'
-    },
-    timeout: 15000
-})
+    }
+});
 
 api.interceptors.request.use(
     (config) => {
@@ -30,5 +29,12 @@ api.interceptors.response.use(
         return Promise.reject(error)
     }
 )
+
+api.interceptors.request.use((config) => {
+    if (config.data instanceof FormData) {
+        config.headers['Content-Type'] = 'multipart/form-data';
+    }
+    return config;
+});
 
 export default api
