@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('sku')->unique()->nullable();
             $table->longText('description')->nullable();
-            $table->string('image')->nullable();
+            $table->string('thumbnail')->nullable();
             $table->decimal('buying_price', 10, 2);
             $table->decimal('selling_price', 10, 2);
 
