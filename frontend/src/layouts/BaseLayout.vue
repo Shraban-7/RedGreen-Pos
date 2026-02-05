@@ -7,26 +7,22 @@ const toast = useToast();
 </script>
 
 <template>
-  <div class="min-h-screen flex overflow-hidden">
+  <div class="h-screen flex overflow-hidden">  <!-- FIXED: h-screen -->
 
-    <div class="flex flex-1 bg-linear-to-br from-gray-50 via-gray-100 to-gray-200">
+    <!-- Sidebar -->
+    <Sidebar />
 
-      <!-- Sidebar -->
-      <Sidebar />
+    <!-- Right Content Layout -->
+    <div class="flex flex-col flex-1 overflow-hidden bg-gray-100">
 
-      <!-- Main content -->
-      <div class="flex flex-col flex-1 overflow-hidden">
+      <!-- Navbar (Fixed & non-scrollable) -->
+      <Navbar />
 
-        <!-- Navbar -->
-        <Navbar />
-
-        <!-- Page Body -->
-        <main class="flex-1 overflow-y-auto p-6 transition-colors duration-300">
-          <Toast position="top-right" />
-          <router-view />
-        </main>
-
-      </div>
+      <!-- Main Scrollable Content -->
+      <main class="flex-1 overflow-y-auto p-6">
+        <Toast position="top-right" />
+        <router-view />
+      </main>
 
     </div>
   </div>

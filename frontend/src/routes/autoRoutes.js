@@ -1,11 +1,31 @@
 export function generateDynamicRoutes(menuLinks) {
-    return menuLinks.map(link => {
-        const cleanPath = link.path.replace(/^\//, ""); 
+    const routes = [];
 
-        return {
-            path: cleanPath,
-            name: link.name,
-            component: () => import(`@/pages/${cleanPath}.vue`) 
-        };
+    menuLinks.forEach(link => {
+
+        // Parent route
+        if (!link.children) {
+            const cleanPath = link.path.replace(/^\//, "");
+            routes.push({
+                path: cleanPath,
+                name: link.name,
+                component: () => import(`@/pages/${cleanPath}.vue`)
+            });
+        }
+
+        // Child routes
+        if (link.children) {
+            link.children.forEach(child => {
+                const cleanPath = child.path.replace(/^\//, "");
+                routes.push({
+                    path: cleanPath,
+                    name: child.name,
+                    component: () => import(`@/pages/${cleanPath}.vue`)
+                });
+            });
+        }
+
     });
+
+    return routes;
 }

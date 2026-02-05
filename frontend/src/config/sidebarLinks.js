@@ -4,34 +4,37 @@ export const menuLinks = [
     path: "/dashboard",
     icon: "pi pi-home",
   },
+
   {
-    name: "products",
-    path: "/products",
+    name: "Products",
     icon: "pi pi-box",
+    children: [
+      { name: "Product List", path: "/products" },
+      { name: "Add Product", path: "/products/create" }
+    ]
   },
+
   {
-    name: "categories",
+    name: "Categories",
     path: "/categories",
     icon: "pi pi-list",
   },
+
   {
-    name: "brands",
+    name: "Brands",
     path: "/brands",
     icon: "pi pi-building",
   },
+
   {
     name: "Orders",
     path: "/orders",
     icon: "pi pi-shopping-cart",
   },
+
   {
-    name: "suppliers",
+    name: "Suppliers",
     path: "/suppliers",
     icon: "pi pi-warehouse",
-  },
-  {
-    name: "Reports",
-    path: "/reports",
-    icon: "pi pi-chart-line",
-  },
+  }
 ];

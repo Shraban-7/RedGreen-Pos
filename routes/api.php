@@ -14,34 +14,36 @@ Route::middleware("auth:sanctum")->group(function () {
     Route::get('/user', function (Request $request) {
         return apiResponse(new UserResource($request->user()));
     });
+
+    Route::prefix("categories")->group(function () {
+        Route::get("/", [CategoryController::class, "index"]);
+        Route::post("/", [CategoryController::class, "store"]);
+        Route::get("/{slug}", [CategoryController::class, "show"]);
+        Route::put("/{slug}", [CategoryController::class, "update"]);
+        Route::delete("/{slug}", [CategoryController::class, "destroy"]);
+    });
+
+    Route::prefix("brands")->group(function () {
+        Route::get("/", [BrandController::class, "index"]);
+        Route::post("/", [BrandController::class, "store"]);
+        Route::get("/{slug}", [BrandController::class, "show"]);
+        Route::put("/{slug}", [BrandController::class, "update"]);
+        Route::delete("/{slug}", [BrandController::class, "destroy"]);
+        Route::put("/{slug}/status", [BrandController::class, "status"]);
+    });
+
+    Route::prefix("products")->group(function () {
+        Route::get("/", [ProductController::class, "index"]);
+        Route::post("/", [ProductController::class, "store"]);
+        Route::get("/{slug}", [ProductController::class, "show"]);
+        Route::put("/{slug}", [ProductController::class, "update"]);
+        Route::delete("/{slug}", [ProductController::class, "destroy"]);
+    });
+
+    Route::apiResource('suppliers', SupplierController::class);
 });
 
 Route::post("/register", [AuthController::class, "register"]);
 Route::post("/login", [AuthController::class, "login"]);
 
-Route::prefix("categories")->group(function () {
-    Route::get("/", [CategoryController::class, "index"]);
-    Route::post("/", [CategoryController::class, "store"]);
-    Route::get("/{slug}", [CategoryController::class, "show"]);
-    Route::put("/{slug}", [CategoryController::class, "update"]);
-    Route::delete("/{slug}", [CategoryController::class, "destroy"]);
-});
 
-Route::prefix("brands")->group(function () {
-    Route::get("/", [BrandController::class, "index"]);
-    Route::post("/", [BrandController::class, "store"]);
-    Route::get("/{slug}", [BrandController::class, "show"]);
-    Route::put("/{slug}", [BrandController::class, "update"]);
-    Route::delete("/{slug}", [BrandController::class, "destroy"]);
-    Route::put("/{slug}/status", [BrandController::class, "status"]);
-});
-
-Route::prefix("products")->group(function () {
-    Route::get("/", [ProductController::class, "index"]);
-    Route::post("/", [ProductController::class, "store"]);
-    Route::get("/{slug}", [ProductController::class, "show"]);
-    Route::put("/{slug}", [ProductController::class, "update"]);
-    Route::delete("/{slug}", [ProductController::class, "destroy"]);
-});
-
-Route::apiResource('suppliers', SupplierController::class);

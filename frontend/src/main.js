@@ -3,7 +3,7 @@ import App from './App.vue'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura';
 import './main.css'
-import router from './routes/router'
+import router from './routes/index'
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserSecret, faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -11,6 +11,8 @@ import ToastService from 'primevue/toastservice'
 import Toast from 'primevue/toast';
 import { createPinia } from 'pinia';
 import api from './config/axios';
+import Editor from 'primevue/editor';
+
 
 library.add(faUserSecret, faCoffee);
 
@@ -33,6 +35,7 @@ app.use(PrimeVue, {
 app.use(ToastService) 
 app.component('Toast', Toast)
 app.component('font-awesome-icon', FontAwesomeIcon);
+app.component('Editor', Editor);
 
 app.config.globalProperties.$api = api;
 app.mount('#app')

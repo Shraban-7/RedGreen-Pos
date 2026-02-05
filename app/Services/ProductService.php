@@ -2,6 +2,7 @@
 
 namespace App\Services;
 use App\Models\Product;
+use Illuminate\Support\Str;
 use App\Repositories\Product\ProductRepositoryInterface;
 
 class ProductService
@@ -24,6 +25,8 @@ class ProductService
 
     public function store($data)
     {
+        $data['user_id'] = auth()->id();
+        $data['sku'] = 'PRD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
         $data['slug'] = str_slug('products', 'slug', $data['name']);
         if (isset($data['thumbnail']) && $data['thumbnail']) {
             $data['thumbnail'] = upload_file($data['thumbnail'], 'products');
@@ -34,6 +37,8 @@ class ProductService
 
     public function update(Product $product, $data)
     {
+        $data['user_id'] = auth()->id();
+        $data['sku'] = 'PRD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
         if (isset($data['name']) && $data['name'] !== $product->name) {
             $data['slug'] = str_slug('products', 'slug', $data['name'], '-', $product->id);
         }

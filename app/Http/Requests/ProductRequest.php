@@ -20,12 +20,12 @@ class ProductRequest extends FormRequest
         return [
             'category_id' => ['required', 'exists:categories,id'],
             'brand_id' => ['required', 'exists:brands,id'],
-            'user_id' => ['required', 'exists:users,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
 
             'name' => ['required', 'string', 'max:255'],
 
             'slug' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
                 Rule::unique('products', 'slug')->ignore($productId),
