@@ -12,7 +12,7 @@ export default [
     meta: { auth: true }
   },
   {
-    path: '/products/:id/edit',
+    path: '/products/:slug/edit',
     name: 'products.edit',
     component: () => import('@/pages/products/ProductEdit.vue'),
     meta: { auth: true }

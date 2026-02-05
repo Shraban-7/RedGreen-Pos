@@ -8,7 +8,7 @@ class ProductRepository implements ProductRepositoryInterface
 {
     public function all()
     {
-        return Product::latest()->get();
+        return Product::with('category','brand')->get();
     }
 
     public function paginate($limit = 20)

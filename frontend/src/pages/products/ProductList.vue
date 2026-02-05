@@ -66,41 +66,24 @@ onMounted(fetchProducts);
 
 <template>
     <div class="space-y-6">
-
         <!-- HEADER -->
-        <div class="bg-white border rounded-xl shadow p-6 flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Manage Products</h1>
-                <p class="text-gray-500 text-sm mt-1">View and manage all products</p>
-            </div>
-
-            <button
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                @click="$router.push('/products/create')"
-            >
-                + Create Product
-            </button>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Manage Products</h1>
         </div>
 
         <!-- PRODUCT TABLE -->
         <div class="bg-white border rounded-xl shadow p-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Product List</h2>
 
-            <DataTable
-                :value="products"
-                stripedRows
-                paginator
-                :rows="10"
-                :rowsPerPageOptions="[10, 20, 50]"
-                tableStyle="min-width: 50rem;"
-            >
+            <DataTable :value="products" stripedRows paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]"
+                tableStyle="min-width: 50rem;">
                 <Column field="sku" header="Code"></Column>
                 <Column field="name" header="Name"></Column>
                 <Column field="category.name" header="Category"></Column>
 
                 <Column header="Quantity">
                     <template #body="{ data }">
-                        {{ data.quantity ?? (data.stock_in - data.stock_out) }}
+                        {{ data.stock.available_quantity }}
                     </template>
                 </Column>
 
@@ -110,18 +93,14 @@ onMounted(fetchProducts);
                         <div class="flex items-center gap-3">
 
                             <!-- EDIT -->
-                            <button
-                                @click="$router.push(`/products/${data.slug}/edit`)"
-                                class="px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm"
-                            >
+                            <button @click="$router.push(`/products/${data.slug}/edit`)"
+                                class="px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm">
                                 Edit
                             </button>
 
                             <!-- DELETE -->
-                            <button
-                                @click="confirmDelete(data)"
-                                class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
-                            >
+                            <button @click="confirmDelete(data)"
+                                class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">
                                 Delete
                             </button>
 
@@ -133,29 +112,18 @@ onMounted(fetchProducts);
         </div>
 
         <!-- DELETE CONFIRMATION MODAL -->
-        <Dialog
-            v-model:visible="deleteModal"
-            modal
-            header="Confirm Delete"
-            class="w-full md:w-96"
-        >
+        <Dialog v-model:visible="deleteModal" modal header="Confirm Delete" class="w-full md:w-96">
             <p class="text-gray-700">
                 Are you sure you want to delete
                 <strong>{{ selectedProduct?.name }}</strong>?
             </p>
 
             <div class="flex justify-end gap-3 mt-6">
-                <button
-                    class="px-4 py-2 bg-gray-200 rounded-lg"
-                    @click="deleteModal = false"
-                >
+                <button class="px-4 py-2 bg-gray-200 rounded-lg" @click="deleteModal = false">
                     Cancel
                 </button>
 
-                <button
-                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                    @click="deleteProduct"
-                >
+                <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" @click="deleteProduct">
                     Yes, Delete
                 </button>
             </div>

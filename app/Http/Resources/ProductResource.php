@@ -36,8 +36,8 @@ class ProductResource extends JsonResource
 
             'description' => $this->description,
 
-            'image' => $this->image
-                ? storage_url($this->image)
+            'thumbnail' => $this->thumbnail
+                ? storage_url($this->thumbnail)
                 : null,
 
             'pricing' => [
