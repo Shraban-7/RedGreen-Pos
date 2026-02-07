@@ -38,17 +38,25 @@ class ProductService
     public function update(Product $product, $data)
     {
         $data['user_id'] = auth()->id();
-        $data['sku'] = 'PRD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+
+
+        if (!isset($data['sku']) || !$data['sku']) {
+             $data['sku'] = 'PRD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+        } else {
+            $data['sku'] = $product->sku;
+        }
+
+
         if (isset($data['name']) && $data['name'] !== $product->name) {
             $data['slug'] = str_slug('products', 'slug', $data['name'], '-', $product->id);
         }
 
         if (isset($data['thumbnail']) && $data['thumbnail']) {
-            if ($product->image) {
-                delete_file($product->image);
+            if ($product->thumbnail) {
+                delete_file($product->thumbnail);
             }
 
-            $data['thumbnail'] = upload_file($data['image'], 'products');
+            $data['thumbnail'] = upload_file($data['thumbnail'], 'products');
         }
 
         $data = $this->prepareProductData($data, true);
@@ -58,6 +66,10 @@ class ProductService
 
     public function deleteProduct(Product $product)
     {
+        if ($product->thumbnail) {
+            delete_file($product->thumbnail);
+        }
+
         return $this->productRepo->delete($product->id);
     }
 

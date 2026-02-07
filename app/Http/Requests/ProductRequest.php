@@ -35,7 +35,6 @@ class ProductRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('products', 'sku')->ignore($productId),
             ],
 
             'description' => ['nullable', 'string'],
