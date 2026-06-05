@@ -45,8 +45,7 @@ class ProductService
         } else {
             $data['sku'] = $product->sku;
         }
-
-
+ 
         if (isset($data['name']) && $data['name'] !== $product->name) {
             $data['slug'] = str_slug('products', 'slug', $data['name'], '-', $product->id);
         }
