@@ -11,7 +11,9 @@ import categories from './modules/categories';
 import brands from './modules/brands';
 import orders from './modules/orders';
 import suppliers from './modules/suppliers';
-// import reports from './modules/reports';
+import pos from './modules/pos';
+import expenses from './modules/expenses';
+import reports from './modules/reports';
 import auth from './modules/auth';
 
 const routes = [
@@ -22,20 +24,22 @@ const routes = [
     children: auth
   },
 
-  // Protected Base Layout
-  {
-    path: '/',
-    component: BaseLayout,
-    children: [
-      ...dashboard,
-      ...products,
-      ...categories,
-      ...brands,
-      ...orders,
-      ...suppliers,
-    //   ...reports
-    ]
-  },
+// Protected Base Layout
+   {
+     path: '/',
+     component: BaseLayout,
+     children: [
+       ...dashboard,
+       ...products,
+       ...categories,
+       ...brands,
+       ...orders,
+       ...suppliers,
+       ...pos,
+       ...expenses,
+       ...reports,
+     ]
+   },
 
   // Fallback
   { path: '/:pathMatch(.*)*', redirect: '/dashboard' }
@@ -54,10 +58,13 @@ router.beforeEach(async (to) => {
     await auth.fetchUser();
   }
 
+  // Redirect unauthenticated users away from protected routes to /login,
+  // preserving the intended destination so login can send them back.
   if (to.meta.auth && !auth.isAuthenticated) {
-    return '/login';
+    return { path: '/login', query: { redirect: to.fullPath } };
   }
 
+  // An already-authenticated user should not see the login form again.
   if (to.name === 'login' && auth.isAuthenticated) {
     return '/dashboard';
   }

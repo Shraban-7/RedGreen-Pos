@@ -33,8 +33,34 @@ export const menuLinks = [
   },
 
   {
+    name: "POS",
+    icon: "pi pi-calculator",
+    children: [
+      { name: "New Sale", path: "/pos/create" },
+      { name: "Sales History", path: "/pos/sales" }
+    ]
+  },
+
+  {
     name: "Suppliers",
     path: "/suppliers",
     icon: "pi pi-warehouse",
+  },
+
+  {
+    name: "Expenses",
+    path: "/expenses",
+    icon: "pi pi-money-bill",
+  },
+
+  {
+    name: "Reports",
+    icon: "pi pi-chart-bar",
+    children: [
+      { name: "Sales Report", path: "/reports/sales" },
+      { name: "Customers Report", path: "/reports/customers" },
+      { name: "Expenses Report", path: "/reports/expenses" },
+      { name: "Overall Report", path: "/reports/overall" }
+    ]
   }
 ];

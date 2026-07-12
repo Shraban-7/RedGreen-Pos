@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 
 import InputText from 'primevue/inputtext'
@@ -10,6 +10,7 @@ import Button from 'primevue/button'
 import Card from 'primevue/card'
 
 const auth = useAuthStore()
+const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 
@@ -31,7 +32,8 @@ const submit = async () => {
       detail: 'Welcome back',
       life: 3000,
     })
-    router.push('/')
+    const redirect = route.query.redirect
+    router.push(redirect ? redirect : '/')
   } catch (error) {
     toast.add({
       severity: 'error',

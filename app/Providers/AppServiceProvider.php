@@ -23,6 +23,22 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Supplier\SupplierRepositoryInterface::class,
             \App\Repositories\Supplier\SupplierRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Customer\CustomerRepositoryInterface::class,
+            \App\Repositories\Customer\CustomerRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Sale\SaleRepositoryInterface::class,
+            \App\Repositories\Sale\SaleRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Expense\ExpenseRepositoryInterface::class,
+            \App\Repositories\Expense\ExpenseRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\ExpenseCategory\ExpenseCategoryRepositoryInterface::class,
+            \App\Repositories\ExpenseCategory\ExpenseCategoryRepository::class
+        );
     }
 
     /**

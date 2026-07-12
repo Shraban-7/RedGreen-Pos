@@ -43,4 +43,20 @@ class ProductRepository implements ProductRepositoryInterface
         $product = $this->find($id);
         return $product->delete();
     }
+
+    public function lowStock($limit = 10)
+    {
+        return Product::select('id', 'name', 'stock_in', 'stock_out', 'low_stock_quantity')
+            ->whereRaw('(stock_in - stock_out) <= low_stock_quantity')
+            ->orderByRaw('(stock_in - stock_out) ASC')
+            ->limit($limit)
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'stock' => max($product->stock_in - $product->stock_out, 0),
+                ];
+            });
+    }
 }
